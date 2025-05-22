@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  account-service:
+    build: ./account-service
+    container_name: account-service-dev
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8081
+      - TRANSACTION_SERVICE_URL=http://transaction-service-dev:8082
+      - AUTH_SERVICE_URL=http://auth-service-dev:8083
+    networks:
+      - bank-network-dev
+    volumes:
+      - ./account-service:/app
+    restart: always
+
+  transaction-service:
+    build: ./transaction-service
+    container_name: transaction-service-dev
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8082
+      - ACCOUNT_SERVICE_URL=http://account-service-dev:8081
+      - NOTIFICATION_SERVICE_URL=http://notification-service-dev:8084
+    networks:
+      - bank-network-dev
+    volumes:
+      - ./transaction-service:/app
+    restart: always
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service-dev
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8083
+      - USER_SERVICE_URL=http://user-service-dev:8085
+    networks:
+      - bank-network-dev
+    volumes:
+      - ./auth-service:/app
+    restart: always
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service-dev
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8084
+    networks:
+      - bank-network-dev
+    volumes:
+      - ./notification-service:/app
+    restart: always
+
+  user-service:
+    build: ./user-service
+    container_name: user-service-dev
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8085
+    networks:
+      - bank-network-dev
+    volumes:
+      - ./user-service:/app
+    restart: always
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway-dev
+    ports:
+      - "9999:9999"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=9999
+      - ACCOUNT_SERVICE_URL=http://account-service-dev:8081
+      - TRANSACTION_SERVICE_URL=http://transaction-service-dev:8082
+      - AUTH_SERVICE_URL=http://auth-service-dev:8083
+      - NOTIFICATION_SERVICE_URL=http://notification-service-dev:8084
+      - USER_SERVICE_URL=http://user-service-dev:8085
+    networks:
+      - bank-network-dev
+    volumes:
+      - ./api-gateway:/app
+    restart: always
+    depends_on:
+      - account-service
+      - transaction-service
+      - auth-service
+      - notification-service
+      - user-service
+
+networks:
+  bank-network-dev:
+    driver: bridge
