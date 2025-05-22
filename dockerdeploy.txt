@@ -1,0 +1,54 @@
+# Install Java 17
+sudo apt-get install -y openjdk-17-jdk
+
+# Install Maven
+sudo apt-get install -y maven
+
+# Verify installations
+java -version
+mvn -version
+
+# Build Individual Services
+# Build account-service
+cd account-service
+mvn clean package -DskipTests
+cd ..
+
+# Build transaction-service
+cd transaction-service
+mvn clean package -DskipTests
+cd ..
+
+# Build auth-service
+cd auth-service
+mvn clean package -DskipTests
+cd ..
+
+# Build notification-service
+cd notification-service
+mvn clean package -DskipTests
+cd ..
+
+# Build user-service
+cd user-service
+mvn clean package -DskipTests
+cd ..
+
+# Build api-gateway
+cd api-gateway
+mvn clean package -DskipTests
+cd ..
+
+Alternatively, you can use the provided build script:
+  # Make the build script executable
+chmod +x build.sh
+
+# Run the build script
+./build.sh
+
+  After building all services, you can run Docker Compose:
+docker-compose up -d
+
+  docker-compose ps
+  
+http://your-ec2-ip:9999
